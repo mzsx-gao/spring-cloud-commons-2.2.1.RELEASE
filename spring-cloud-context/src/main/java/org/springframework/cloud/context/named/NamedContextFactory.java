@@ -98,6 +98,7 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 		if (!this.contexts.containsKey(name)) {
 			synchronized (this.contexts) {
 				if (!this.contexts.containsKey(name)) {
+					// 如果不存在指定服务的容器，创建一个，然后存起来以备复用
 					this.contexts.put(name, createContext(name));
 				}
 			}
@@ -105,14 +106,27 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 		return this.contexts.get(name);
 	}
 
+	/**
+	 * 创建指定服务名称对应的内置容器，在内置容器中注册bean时，可以看到是将就顺序的
+	 * 比如说:EurekaRibbonClientConfiguration和RibbonClientConfiguration两个配置类都配置了ServerList< ?
+	 * >类型的Bean， 但是因为他们都标识了@ConditionalOnMissingBean 注解，也就是说哪个配置类先加载，就用哪个配置类的Bean
+	 */
 	protected AnnotationConfigApplicationContext createContext(String name) {
+		// 创建容器
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+
+		// 如果配置类上含有指定应用名称的键值对，那么将此 RibbonClientSpecification 的 configuration 类都注册到内置容器中
+		// 可通过@RibbonClient将自定义Ribbon服务配置引入此容器中
 		if (this.configurations.containsKey(name)) {
 			for (Class<?> configuration : this.configurations.get(name)
 					.getConfiguration()) {
 				context.register(configuration);
 			}
 		}
+
+		// 配置类的key 是否是 "default." 开头的，如果是，那么也注册到服务对应的内置容器中
+		// 三方组件集成ribbon都是走这里完成对应bean的注册,比如说：
+		// EurekaRibbonClientConfiguration或者NacosRibbonClientConfiguration
 		for (Map.Entry<String, C> entry : this.configurations.entrySet()) {
 			if (entry.getKey().startsWith("default.")) {
 				for (Class<?> configuration : entry.getValue().getConfiguration()) {
@@ -120,11 +134,14 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 				}
 			}
 		}
+
+		// 注册默认的配置和环境变量替换器 ， RibbonClientConfiguration 就是在此步骤注册
 		context.register(PropertyPlaceholderAutoConfiguration.class,
 				this.defaultConfigType);
 		context.getEnvironment().getPropertySources().addFirst(new MapPropertySource(
 				this.propertySourceName,
 				Collections.<String, Object>singletonMap(this.propertyName, name)));
+
 		if (this.parent != null) {
 			// Uses Environment from parent as well as beans
 			context.setParent(this.parent);
@@ -133,6 +150,7 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 			context.setClassLoader(this.parent.getClassLoader());
 		}
 		context.setDisplayName(generateDisplayName(name));
+		// 刷新容器，实例化所有Bean
 		context.refresh();
 		return context;
 	}
@@ -141,6 +159,9 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 		return this.getClass().getSimpleName() + "-" + name;
 	}
 
+	/**
+	 * 根据服务名称创建一个容器，然后把容器根据服务名称缓存
+	 */
 	public <T> T getInstance(String name, Class<T> type) {
 		AnnotationConfigApplicationContext context = getContext(name);
 		if (BeanFactoryUtils.beanNamesForTypeIncludingAncestors(context,

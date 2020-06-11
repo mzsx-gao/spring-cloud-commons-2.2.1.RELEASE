@@ -22,7 +22,8 @@ import java.net.URI;
 import org.springframework.cloud.client.ServiceInstance;
 
 /**
- * Represents a client-side load balancer.
+ * 客户端负载均衡器，这里springcloud定义了一个标准，三方去适配
+ * 比如:ribbon中的RibbonLoadBalancerClient
  *
  * @author Spencer Gibb
  */

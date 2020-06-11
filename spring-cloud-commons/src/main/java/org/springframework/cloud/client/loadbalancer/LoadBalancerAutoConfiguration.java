@@ -36,7 +36,7 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * Auto-configuration for Ribbon (client-side load balancing).
- *
+ * 客户端负载均衡自动装配，这里springcloud定义了一个标准，具体实现由三方组件提供
  * @author Spencer Gibb
  * @author Dave Syer
  * @author Will Tran
@@ -79,8 +79,7 @@ public class LoadBalancerAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public LoadBalancerRequestFactory loadBalancerRequestFactory(
-			LoadBalancerClient loadBalancerClient) {
+	public LoadBalancerRequestFactory loadBalancerRequestFactory(LoadBalancerClient loadBalancerClient) {
 		return new LoadBalancerRequestFactory(loadBalancerClient, this.transformers);
 	}
 
@@ -88,21 +87,19 @@ public class LoadBalancerAutoConfiguration {
 	@ConditionalOnMissingClass("org.springframework.retry.support.RetryTemplate")
 	static class LoadBalancerInterceptorConfig {
 
+		//定义拦截器，这个拦截器会被注入到restTemplate中，介入restTemplate发送http请求过程，实现负载均衡
 		@Bean
 		public LoadBalancerInterceptor ribbonInterceptor(
-				LoadBalancerClient loadBalancerClient,
-				LoadBalancerRequestFactory requestFactory) {
+				LoadBalancerClient loadBalancerClient, LoadBalancerRequestFactory requestFactory) {
 			return new LoadBalancerInterceptor(loadBalancerClient, requestFactory);
 		}
 
 		//把拦截器设置到 restTemplate 中
 		@Bean
 		@ConditionalOnMissingBean
-		public RestTemplateCustomizer restTemplateCustomizer(
-				final LoadBalancerInterceptor loadBalancerInterceptor) {
+		public RestTemplateCustomizer restTemplateCustomizer(final LoadBalancerInterceptor loadBalancerInterceptor) {
 			return restTemplate -> {
-				List<ClientHttpRequestInterceptor> list = new ArrayList<>(
-						restTemplate.getInterceptors());
+				List<ClientHttpRequestInterceptor> list = new ArrayList<>(restTemplate.getInterceptors());
 				list.add(loadBalancerInterceptor);
 				restTemplate.setInterceptors(list);
 			};
