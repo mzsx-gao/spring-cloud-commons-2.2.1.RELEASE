@@ -83,21 +83,29 @@ public class ContextRefresher {
 
 	public synchronized Set<String> refresh() {
 		Set<String> keys = refreshEnvironment();
+		// RefreshScope用新的环境参数重新生成Bean，重新生成的过程很简单，清除refreshscope缓存幷销毁Bean，
+        // 下次就会重新从BeanFactory获取一个新的实例（该实例使用新的配置）
 		this.scope.refreshAll();
 		return keys;
 	}
 
 	public synchronized Set<String> refreshEnvironment() {
+	    //提取标准参数(SYSTEM,JNDI,SERVLET)之外所有参数变量
 		Map<String, Object> before = extract(
 				this.context.getEnvironment().getPropertySources());
+		//把原来的Environment里的参数放到一个新建的Spring Context容器下重新加载，完事之后关闭新容器
 		addConfigFilesToEnvironment();
+		//提取更新过的参数(排除标准参数)，比较出变更项
 		Set<String> keys = changes(before,
 				extract(this.context.getEnvironment().getPropertySources())).keySet();
+		// 发布EnvironmentChangeEvent事件，ConfigurationPropertiesRebinder会监听到该事件，
+        // 对带有@ConfigurationProperties注解的类进行刷新
 		this.context.publishEvent(new EnvironmentChangeEvent(this.context, keys));
 		return keys;
 	}
 
-	/* For testing. */ ConfigurableApplicationContext addConfigFilesToEnvironment() {
+	/* For testing. */
+	ConfigurableApplicationContext addConfigFilesToEnvironment() {
 		ConfigurableApplicationContext capture = null;
 		try {
 			StandardEnvironment environment = copyEnvironment(

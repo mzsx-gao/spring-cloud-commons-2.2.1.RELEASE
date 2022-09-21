@@ -45,6 +45,7 @@ public class ConfigurationPropertiesRebinderAutoConfiguration
 		this.context = applicationContext;
 	}
 
+	//下面这两个配置类是为了处理当配置中心配置发生变化时，自动刷新有@ConfigurationProperties注解的bean
 	@Bean
 	@ConditionalOnMissingBean(search = SearchStrategy.CURRENT)
 	public static ConfigurationPropertiesBeans configurationPropertiesBeans() {
@@ -55,8 +56,7 @@ public class ConfigurationPropertiesRebinderAutoConfiguration
 	@ConditionalOnMissingBean(search = SearchStrategy.CURRENT)
 	public ConfigurationPropertiesRebinder configurationPropertiesRebinder(
 			ConfigurationPropertiesBeans beans) {
-		ConfigurationPropertiesRebinder rebinder = new ConfigurationPropertiesRebinder(
-				beans);
+		ConfigurationPropertiesRebinder rebinder = new ConfigurationPropertiesRebinder(beans);
 		return rebinder;
 	}
 

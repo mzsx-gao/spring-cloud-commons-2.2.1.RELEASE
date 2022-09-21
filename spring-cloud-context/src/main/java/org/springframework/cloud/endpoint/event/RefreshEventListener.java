@@ -57,6 +57,7 @@ public class RefreshEventListener implements SmartApplicationListener {
 		if (event instanceof ApplicationReadyEvent) {
 			handle((ApplicationReadyEvent) event);
 		}
+		//处理RefreshEvent事件,nacos配置修改时会发布RefreshEvent事件
 		else if (event instanceof RefreshEvent) {
 			handle((RefreshEvent) event);
 		}

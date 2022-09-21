@@ -83,6 +83,7 @@ public class RefreshAutoConfiguration {
 	 */
 	public static final String REFRESH_SCOPE_ENABLED = REFRESH_SCOPE_PREFIX + ".enabled";
 
+    // 注册RefreshScope
 	@Bean
 	@ConditionalOnMissingBean(RefreshScope.class)
 	public static RefreshScope refreshScope() {
@@ -95,6 +96,7 @@ public class RefreshAutoConfiguration {
 		return new LoggingRebinder();
 	}
 
+    // 主要功能是刷新配置文件，发布事件（事件监听程序接收到事件后会重写配置相关的配置类）
 	@Bean
 	@ConditionalOnMissingBean
 	public ContextRefresher contextRefresher(ConfigurableApplicationContext context,
@@ -102,6 +104,7 @@ public class RefreshAutoConfiguration {
 		return new ContextRefresher(context, scope);
 	}
 
+    // 监听上下文刷新事件
 	@Bean
 	public RefreshEventListener refreshEventListener(ContextRefresher contextRefresher) {
 		return new RefreshEventListener(contextRefresher);

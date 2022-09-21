@@ -55,8 +55,8 @@ public class LoadBalancerInterceptor implements ClientHttpRequestInterceptor {
 		//获取服务名称
 		String serviceName = originalUri.getHost();
 		Assert.state(serviceName != null, "Request URI does not contain a valid hostname: " + originalUri);
-		return this.loadBalancer.execute(serviceName,
-				this.requestFactory.createRequest(request, body, execution));
+		//调用LoadBalancer客户端的execute方法
+		return this.loadBalancer.execute(serviceName, this.requestFactory.createRequest(request, body, execution));
 	}
 
 }

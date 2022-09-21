@@ -18,7 +18,7 @@ package org.springframework.cloud.client.serviceregistry;
 
 /**
  * Contract to register and deregister instances with a Service Registry.
- *
+ * 注册服务
  * @param <R> registration meta data
  * @author Spencer Gibb
  * @since 1.2.0

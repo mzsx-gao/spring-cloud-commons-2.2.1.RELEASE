@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Import;
 public class AutoServiceRegistrationAutoConfiguration {
 
 	//完成自动注册，这里springcloud只定义标准，由三方继承AbstractAutoServiceRegistration来做具体实现
-	//比如:NacosServiceRegistryAutoConfiguration
+	//比如:NacosAutoServiceRegistration
 	@Autowired(required = false)
 	private AutoServiceRegistration autoServiceRegistration;
 

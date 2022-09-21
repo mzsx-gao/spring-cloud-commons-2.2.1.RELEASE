@@ -151,6 +151,7 @@ public class RefreshScope extends GenericScope implements ApplicationContextAwar
 	@ManagedOperation(description = "Dispose of the current instance of all beans "
 			+ "in this scope and force a refresh on next method execution.")
 	public void refreshAll() {
+	    //当前清空了缓存对象后，下次再进入注入的时候会再次调用ObjectFacotry#getObject方法创建新的对象
 		super.destroy();
 		this.context.publishEvent(new RefreshScopeRefreshedEvent());
 	}

@@ -53,6 +53,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.support.RootBeanDefinition;
+import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParseException;
@@ -240,6 +241,11 @@ public class GenericScope implements Scope, BeanFactoryPostProcessor,
 		}
 	}
 
+    /**
+     * 在这里会注册RefreshScope。注册的Scope将会在AbstractBeanFactory#doGetBean方法中调用，
+     * 该方法中会先拿到当前BeanDefinition中定义的Scope，通过scopeName从Map集合中拿到Scope类，
+     * 最后调用Scope的get方法获取实例对象
+     */
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
 			throws BeansException {
@@ -386,6 +392,12 @@ public class GenericScope implements Scope, BeanFactoryPostProcessor,
 			if (this.bean == null) {
 				synchronized (this.name) {
 					if (this.bean == null) {
+					    /**
+                         * 如果缓存中没有，则调用ObjectFacotry#getObject方法创建新的对象，这里注意在配置中心配置改变时，
+                         * RefreshEventListener会监听到配置改变，然后清空缓存，下次访问带@RefreshScope注解的类会从这里
+                         * 再次创建一个新实例
+                         * @see org.springframework.cloud.endpoint.event.RefreshEventListener#handle(RefreshEvent)
+					     */
 						this.bean = this.objectFactory.getObject();
 					}
 				}

@@ -36,6 +36,7 @@ public class RefreshEndpoint {
 		this.contextRefresher = contextRefresher;
 	}
 
+	//配置中心的配置改变时，刷新bean示例，如加@RefreshScope和@ConfigurationProperties注解的类
 	@WriteOperation
 	public Collection<String> refresh() {
 		Set<String> keys = this.contextRefresher.refresh();

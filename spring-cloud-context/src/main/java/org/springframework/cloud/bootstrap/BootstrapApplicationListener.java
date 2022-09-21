@@ -114,8 +114,7 @@ public class BootstrapApplicationListener
 			}
 		}
 		if (context == null) {
-			context = bootstrapServiceContext(environment, event.getSpringApplication(),
-					configName);
+			context = bootstrapServiceContext(environment, event.getSpringApplication(), configName);
 			event.getSpringApplication()
 					.addListeners(new CloseContextOnFailureApplicationListener(context));
 		}
@@ -146,12 +145,17 @@ public class BootstrapApplicationListener
 		}
 	}
 
+	/**
+	 * 新创建一个ApplicationContext,里面的environment中加入了spring.config.name为bootstrap，
+	 * 内部会新构建一个SpringApplication执行其run()方法
+	 * 这里就解释了为何springboot会先加载bootstrap.properties后加载application.properties
+	 * springboot中ConfigFileApplicationListener#Loader#getSearchNames()决定加载bootstrap.properties还是application.properties
+	 */
 	private ConfigurableApplicationContext bootstrapServiceContext(
 			ConfigurableEnvironment environment, final SpringApplication application,
 			String configName) {
 		StandardEnvironment bootstrapEnvironment = new StandardEnvironment();
-		MutablePropertySources bootstrapProperties = bootstrapEnvironment
-				.getPropertySources();
+		MutablePropertySources bootstrapProperties = bootstrapEnvironment.getPropertySources();
 		for (PropertySource<?> source : bootstrapProperties) {
 			bootstrapProperties.remove(source.getName());
 		}

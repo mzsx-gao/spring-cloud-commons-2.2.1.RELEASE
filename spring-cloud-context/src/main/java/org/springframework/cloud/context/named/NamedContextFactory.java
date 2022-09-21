@@ -107,9 +107,9 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 	}
 
 	/**
-	 * 创建指定服务名称对应的内置容器，在内置容器中注册bean时，可以看到是将就顺序的
-	 * 比如说:EurekaRibbonClientConfiguration和RibbonClientConfiguration两个配置类都配置了ServerList< ?
-	 * >类型的Bean， 但是因为他们都标识了@ConditionalOnMissingBean 注解，也就是说哪个配置类先加载，就用哪个配置类的Bean
+	 * 创建指定服务名称对应的内置容器，在内置容器中注册bean时，可以看到是讲究顺序的：
+	 * 比如说:EurekaRibbonClientConfiguration和RibbonClientConfiguration两个配置类都配置了ServerList<?>类型的Bean，
+     * 但是因为他们都标识了@ConditionalOnMissingBean 注解，也就是说哪个配置类先加载，就用哪个配置类的Bean
 	 */
 	protected AnnotationConfigApplicationContext createContext(String name) {
 		// 创建容器
@@ -118,8 +118,7 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 		// 如果配置类上含有指定应用名称的键值对，那么将此 RibbonClientSpecification 的 configuration 类都注册到内置容器中
 		// 可通过@RibbonClient将自定义Ribbon服务配置引入此容器中
 		if (this.configurations.containsKey(name)) {
-			for (Class<?> configuration : this.configurations.get(name)
-					.getConfiguration()) {
+			for (Class<?> configuration : this.configurations.get(name).getConfiguration()) {
 				context.register(configuration);
 			}
 		}
@@ -136,11 +135,9 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 		}
 
 		// 注册默认的配置和环境变量替换器 ， RibbonClientConfiguration 就是在此步骤注册
-		context.register(PropertyPlaceholderAutoConfiguration.class,
-				this.defaultConfigType);
+		context.register(PropertyPlaceholderAutoConfiguration.class, this.defaultConfigType);
 		context.getEnvironment().getPropertySources().addFirst(new MapPropertySource(
-				this.propertySourceName,
-				Collections.<String, Object>singletonMap(this.propertyName, name)));
+				this.propertySourceName, Collections.<String, Object>singletonMap(this.propertyName, name)));
 
 		if (this.parent != null) {
 			// Uses Environment from parent as well as beans
@@ -164,8 +161,7 @@ public abstract class NamedContextFactory<C extends NamedContextFactory.Specific
 	 */
 	public <T> T getInstance(String name, Class<T> type) {
 		AnnotationConfigApplicationContext context = getContext(name);
-		if (BeanFactoryUtils.beanNamesForTypeIncludingAncestors(context,
-				type).length > 0) {
+		if (BeanFactoryUtils.beanNamesForTypeIncludingAncestors(context, type).length > 0) {
 			return context.getBean(type);
 		}
 		return null;

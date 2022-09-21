@@ -58,6 +58,7 @@ public class ConfigurationPropertiesRebinder
 
 	private Map<String, Exception> errors = new ConcurrentHashMap<>();
 
+    //ConfigurationPropertiesRebinderAutoConfiguration自动配置时会取到beans的值
 	public ConfigurationPropertiesRebinder(ConfigurationPropertiesBeans beans) {
 		this.beans = beans;
 	}
@@ -84,6 +85,7 @@ public class ConfigurationPropertiesRebinder
 		}
 	}
 
+	//rebind方法中会对所有带有@ConfigurationProperties注解的类进行刷新，rebind方法中会对bean进行销毁和初始化
 	@ManagedOperation
 	public boolean rebind(String name) {
 		if (!this.beans.getBeanNames().contains(name)) {
@@ -96,10 +98,8 @@ public class ConfigurationPropertiesRebinder
 					bean = ProxyUtils.getTargetObject(bean);
 				}
 				if (bean != null) {
-					this.applicationContext.getAutowireCapableBeanFactory()
-							.destroyBean(bean);
-					this.applicationContext.getAutowireCapableBeanFactory()
-							.initializeBean(bean, name);
+					this.applicationContext.getAutowireCapableBeanFactory().destroyBean(bean);
+					this.applicationContext.getAutowireCapableBeanFactory().initializeBean(bean, name);
 					return true;
 				}
 			}
@@ -120,6 +120,9 @@ public class ConfigurationPropertiesRebinder
 		return new HashSet<>(this.beans.getBeanNames());
 	}
 
+    /**
+      * 在refreshEnvironment方法中会发布一个EnvironmentChangeEvent事件，这里会监听该事件
+      */
 	@Override
 	public void onApplicationEvent(EnvironmentChangeEvent event) {
 		if (this.applicationContext.equals(event.getSource())

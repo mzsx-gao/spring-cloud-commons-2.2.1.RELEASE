@@ -78,6 +78,7 @@ public class PropertySourceBootstrapConfiguration implements
 
 	private int order = Ordered.HIGHEST_PRECEDENCE + 10;
 
+	//依赖注入所有的PropertySourceLocator类型的bean,比如NacosPropertySourceLocator
 	@Autowired(required = false)
 	private List<PropertySourceLocator> propertySourceLocators = new ArrayList<>();
 
@@ -91,6 +92,7 @@ public class PropertySourceBootstrapConfiguration implements
 		this.propertySourceLocators = new ArrayList<>(propertySourceLocators);
 	}
 
+	//加载配置中心的配置，封装为BootstrapPropertySource(内部持有NacosPropertySource)添加到当前ApplicationContext的environment中
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
 		List<PropertySource<?>> composite = new ArrayList<>();
@@ -98,6 +100,7 @@ public class PropertySourceBootstrapConfiguration implements
 		boolean empty = true;
 		ConfigurableEnvironment environment = applicationContext.getEnvironment();
 		for (PropertySourceLocator locator : this.propertySourceLocators) {
+		    //如果是nacos配置中心，则调用NacosPropertySourceLocator的locate方法加载配置中心的配置
 			Collection<PropertySource<?>> source = locator.locateCollection(environment);
 			if (source == null || source.size() == 0) {
 				continue;

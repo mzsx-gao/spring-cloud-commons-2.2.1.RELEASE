@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 public class ConfigurationPropertiesBeans
 		implements BeanPostProcessor, ApplicationContextAware {
 
+    // 添加有@ConfigurationProperties注解的bean都将保存在该集合中
 	private Map<String, ConfigurationPropertiesBean> beans = new HashMap<>();
 
 	private ApplicationContext applicationContext;

@@ -37,6 +37,7 @@ import org.springframework.core.env.PropertySource;
 public interface PropertySourceLocator {
 
 	/**
+     * springboot启动时调用locate方法来加载配置信息
 	 * @param environment The current Environment.
 	 * @return A PropertySource, or null if there is none.
 	 * @throws IllegalStateException if there is a fail-fast condition.

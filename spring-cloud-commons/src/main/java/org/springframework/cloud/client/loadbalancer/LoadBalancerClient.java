@@ -23,7 +23,9 @@ import org.springframework.cloud.client.ServiceInstance;
 
 /**
  * 客户端负载均衡器，这里springcloud定义了一个标准，三方去适配
- * 比如:ribbon中的RibbonLoadBalancerClient
+ * 比如:
+ * ribbon中的实现：RibbonLoadBalancerClient
+ * springcloud自带的实现：BlockingLoadBalancerClient
  *
  * @author Spencer Gibb
  */

@@ -39,7 +39,6 @@ import org.springframework.core.env.Environment;
  * Lifecycle methods that may be useful and common to {@link ServiceRegistry}
  * implementations.
  * 完成自动注册,入口在onApplicationEvent方法
- * TODO: Document the lifecycle.
  *
  * @param <R> Registration type passed to the {@link ServiceRegistry}.
  * @author Spencer Gibb
@@ -82,6 +81,7 @@ public abstract class AbstractAutoServiceRegistration<R extends Registration>
 		return this.context;
 	}
 
+	//自动注册功能入口
 	@Override
 	@SuppressWarnings("deprecation")
 	public void onApplicationEvent(WebServerInitializedEvent event) {
@@ -135,6 +135,7 @@ public abstract class AbstractAutoServiceRegistration<R extends Registration>
 		if (!this.running.get()) {
 			this.context.publishEvent(
 					new InstancePreRegisteredEvent(this, getRegistration()));
+			//注册中心实现register方法
 			register();
 			if (shouldRegisterManagement()) {
 				registerManagement();
